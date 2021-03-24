@@ -1,0 +1,19 @@
+# @see https://docs.docker.com/compose/compose-file/
+version: '3.4'
+services:
+  mongodb-test:
+    container_name: mongo-test
+    image: mongo:4.0
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:30001:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+
+  redis-test:
+    container_name: redis-test
+    image: redis:5.0.7-alpine
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:30002:6379
