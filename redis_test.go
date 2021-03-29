@@ -10,6 +10,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func newRedisTest(keyspace, typeName string, ttl time.Duration) (*Redis, error) {
+	opts, err := redis.ParseURL("redis://127.0.0.1:6379/15")
+	if err != nil {
+		return nil, err
+	}
+
+	c := redis.NewClient(opts)
+	db, err := NewRedis(c, &RedisConfig{"kv_test", "TestObject", 1 * time.Minute})
+	var _ DB = db
+	return db, err
+}
+
 type TestObject1 struct {
 	Int   int
 	Str   string
@@ -20,11 +32,7 @@ type TestObject1 struct {
 func TestRedis(t *testing.T) {
 	assert := require.New(t)
 
-	opts, err := redis.ParseURL("redis://127.0.0.1:6379/15")
-	assert.NoError(err)
-
-	c := redis.NewClient(opts)
-	db, err := NewRedis(c, &RedisConfig{"kv_test", "TestObject", 1 * time.Minute})
+	var db, err = newRedisTest("keyspace", "TestObject1", 1*time.Minute)
 	assert.NoError(err)
 
 	t.Cleanup(func() {

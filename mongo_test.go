@@ -15,15 +15,20 @@ type TestObject struct {
 	Bytes []byte
 }
 
-func TestMongoCollection(t *testing.T) {
-	assert := require.New(t)
-
+func newMongoTest(dbName, collName string) (*MongoCollection, error) {
 	c, err := ConnectMongo(&qmgo.Config{
 		Uri: "mongodb://root:root@127.0.0.1:30001/kv?authSource=admin",
 	})
-	assert.NoError(err)
 
-	db, err := NewMongoCollection(c, "kv_test", "TestObject")
+	db, err := NewMongoCollection(c, dbName, collName)
+	var _ DB = db
+	return db, err
+}
+
+func TestMongoCollection(t *testing.T) {
+	assert := require.New(t)
+
+	db, err := newMongoTest("kv_test", "TestObject")
 	assert.NoError(err)
 	t.Cleanup(func() {
 		db.Del(1)
@@ -56,12 +61,7 @@ func TestMongoCollection(t *testing.T) {
 func TestMongoCollection_1KDocuments(t *testing.T) {
 	assert := require.New(t)
 
-	c, err := ConnectMongo(&qmgo.Config{
-		Uri: "mongodb://root:root@127.0.0.1:30001/kv?authSource=admin",
-	})
-	assert.NoError(err)
-
-	db, err := NewMongoCollection(c, "kv_test", "TestObject")
+	db, err := newMongoTest("kv_test_1kdocs", "TestObject")
 	assert.NoError(err)
 	t.Cleanup(func() {
 		for i := 0; i < 1000; i++ {
