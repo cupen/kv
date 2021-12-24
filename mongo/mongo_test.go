@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cupen/kv/utils"
+	"github.com/cupen/kv/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +32,7 @@ func TestMongoCollection(t *testing.T) {
 		db.Del(1)
 		db.Del(2)
 	})
-	ErrNotFound := utils.ErrNotFound
+	ErrNotFound := errors.ErrNotFound
 
 	val := TestObject{1, "abc", 0.999, []byte{1, 2, 3}}
 	err = db.Get(1, &val)
@@ -59,7 +59,7 @@ func TestMongoCollection(t *testing.T) {
 
 func TestMongoCollection_1KDocuments(t *testing.T) {
 	assert := require.New(t)
-	ErrNotFound := utils.ErrNotFound
+	ErrNotFound := errors.ErrNotFound
 
 	db, err := newMongoTest("kv_test_1kdocs", "TestObject")
 	assert.NoError(err)

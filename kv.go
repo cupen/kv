@@ -1,6 +1,6 @@
 package kv
 
-import "github.com/cupen/kv/utils"
+import "github.com/cupen/kv/errors"
 
 type DB interface {
 	Get(key, val interface{}) error
@@ -11,5 +11,5 @@ type DB interface {
 }
 
 func IsNotFound(err error) bool {
-	return err == utils.ErrNotFound
+	return err == errors.ErrNotFound
 }

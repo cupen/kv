@@ -7,7 +7,7 @@ import (
 	"github.com/cupen/kv/mongo"
 	"github.com/cupen/kv/redis"
 
-	rds "github.com/go-redis/redis/v7"
+	rds "github.com/go-redis/redis/v8"
 )
 
 func BenchmarkMongo(b *testing.B) {

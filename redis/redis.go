@@ -1,13 +1,14 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/cupen/kv/utils"
-	"github.com/go-redis/redis/v7"
+	"github.com/cupen/kv/errors"
+	redis "github.com/go-redis/redis/v8"
 )
 
 type Options struct {
@@ -22,6 +23,8 @@ type Redis struct {
 	baseKey string
 	opts    *Options
 }
+
+var ctx = context.Background()
 
 // NewRedis ...
 func NewRedis(client *redis.Client, opts *Options) (*Redis, error) {
@@ -50,11 +53,11 @@ func (r *Redis) buildKey(id interface{}) string {
 	case string:
 		idtext = _id
 	default:
-		panic(fmt.Errorf("Invalid id(%v) type<%t>", id, id))
+		panic(fmt.Errorf("invalid id(%v) type<%t>", id, id))
 	}
 
 	if idtext == "" {
-		panic(fmt.Errorf("Empty id(%v) type<%t>", id, id))
+		panic(fmt.Errorf("empty id(%v) type<%t>", id, id))
 	}
 	return r.baseKey + idtext
 }
@@ -62,10 +65,10 @@ func (r *Redis) buildKey(id interface{}) string {
 // Get ...
 func (r *Redis) Get(id, val interface{}) error {
 	key := r.buildKey(id)
-	data, err := r.client.Get(key).Bytes()
+	data, err := r.client.Get(ctx, key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
-			return utils.ErrNotFound
+			return errors.ErrNotFound
 		}
 		return err
 	}
@@ -79,11 +82,11 @@ func (r *Redis) Set(id, val interface{}) error {
 	if err != nil {
 		return err
 	}
-	return r.client.Set(key, data, r.opts.TTL).Err()
+	return r.client.Set(ctx, key, data, r.opts.TTL).Err()
 }
 
 // Del ...
 func (r *Redis) Del(id interface{}) error {
 	key := r.buildKey(id)
-	return r.client.Del(key).Err()
+	return r.client.Del(ctx, key).Err()
 }

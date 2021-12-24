@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/cupen/kv/utils"
+	"github.com/cupen/kv/errors"
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +62,7 @@ func (mc *Collection) Get(key, val interface{}) error {
 	q := mc.coll.Find(c, bson.M{"_id": key}).Limit(1)
 	if err := q.One(val); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return utils.ErrNotFound
+			return errors.ErrNotFound
 		}
 		return err
 	}
@@ -81,6 +81,7 @@ func (mc *Collection) Del(key interface{}) error {
 	c := context.Background()
 	if err := mc.coll.RemoveId(c, key); err != nil {
 		if err == qmgo.ErrNoSuchDocuments {
+			// return errors.ErrNotFound
 			return nil
 		}
 		return err
