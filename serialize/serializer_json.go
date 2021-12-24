@@ -3,13 +3,8 @@ package serialize
 import "encoding/json"
 
 var (
-	JsonSerializer = &jsonSerializer{}
+	Json = &jsonSerializer{}
 )
-
-type Serializer interface {
-	Marshal(obj interface{}) ([]byte, error)
-	Unmarshal(data []byte, obj interface{}) error
-}
 
 type jsonSerializer struct{}
 

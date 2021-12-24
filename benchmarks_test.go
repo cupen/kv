@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cupen/kv/mongo"
-	"github.com/cupen/kv/redis"
+	"github.com/cupen/kv/db/mongo"
+	"github.com/cupen/kv/db/redis"
 
 	rds "github.com/go-redis/redis/v8"
 )
@@ -102,5 +102,9 @@ func newRedisTest(keyspace, typeName string, ttl time.Duration) (*redis.Redis, e
 	}
 
 	c := rds.NewClient(opts)
-	return redis.NewRedis(c, &redis.Options{"kv_test", "TestObject", 1 * time.Minute})
+	return redis.New(c, &redis.Options{
+		Keyspace: "kv_test",
+		TypeName: "TestObject",
+		TTL:      1 * time.Minute,
+	})
 }

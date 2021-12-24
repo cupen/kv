@@ -1,21 +1,30 @@
 package kv
 
-type KV [K string | int | int64, T any]struct {
-	cache   DB
-	db      DB
-	creater func(K) (*T, error)
+type _Key interface {
+	string | int | int32 | int64 | float64
 }
 
-func NewKV[ K string | int | int64, T any](db, cache DB, creater func(K) (*T, error)) *KV[K,T] {
-	return &KV[K,T]{
+type _Value any
+
+// objectCreater is a function for create object and initializing it.
+type objectCreater[K _Key, V _Value] func(K) (V, error)
+
+type Store[K _Key, V _Value] struct {
+	cache   DB
+	db      DB
+	creater func(K) (V, error)
+}
+
+func NewStore[K _Key, V _Value](db, cache DB, creater objectCreater[K, V]) *Store[K, V] {
+	return &Store[K, V]{
 		cache:   cache,
 		db:      db,
 		creater: creater,
 	}
 }
 
-func (this *KV[K,T]) Get(key K) (*T, error) {
-	obj := new(T)
+func (this *Store[K, V]) Get(key K) (V, error) {
+	obj := new(V)
 	if err := this.cache.Get(key, obj); err != nil {
 		if IsNotFound(err) {
 			if this.db == nil {
@@ -27,16 +36,21 @@ func (this *KV[K,T]) Get(key K) (*T, error) {
 				}
 			}
 		}
-		return nil, err
+		return *obj, err
 	}
-	return obj, nil
+	return *obj, nil
 }
 
-func (this *KV[K,T]) Set(key interface{}, value interface{}) (error) {
+func (this *Store[K, V]) Set(key K, value *V) error {
 	this.cache.Set(key, value)
 	return this.db.Set(key, value)
 }
 
-func (this *KV[K,T]) Has(key interface{}) (bool, error) {
+func (this *Store[K, V]) Del(key K) error {
+	this.cache.Del(key)
+	return this.db.Del(key)
+}
+
+func (this *Store[K, V]) Has(key K) (bool, error) {
 	return false, nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type Options struct {
-	KeySpace string
+	Keyspace string
 	TypeName string
 	TTL      time.Duration
 }
@@ -26,8 +26,8 @@ type Redis struct {
 
 var ctx = context.Background()
 
-// NewRedis ...
-func NewRedis(client *redis.Client, opts *Options) (*Redis, error) {
+// New ...
+func New(client *redis.Client, opts *Options) (*Redis, error) {
 	if client == nil {
 		return nil, fmt.Errorf("nil client")
 	}
@@ -36,7 +36,7 @@ func NewRedis(client *redis.Client, opts *Options) (*Redis, error) {
 	}
 	return &Redis{
 		client:  client,
-		baseKey: fmt.Sprintf("%s:%s:", opts.KeySpace, opts.TypeName),
+		baseKey: fmt.Sprintf("%s:%s:", opts.Keyspace, opts.TypeName),
 		opts:    opts,
 	}, nil
 }

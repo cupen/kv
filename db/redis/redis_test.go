@@ -15,7 +15,7 @@ func newRedisTest(keyspace, typeName string, ttl time.Duration) (*Redis, error) 
 		return nil, err
 	}
 	c := redis.NewClient(opts)
-	return NewRedis(c, &Options{"kv_test", "TestObject", 1 * time.Minute})
+	return New(c, &Options{"kv_test", "TestObject", 1 * time.Minute})
 }
 
 type TestObject1 struct {

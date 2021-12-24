@@ -88,3 +88,7 @@ func (mc *Collection) Del(key interface{}) error {
 	}
 	return nil
 }
+
+func IsNotFound(err error) bool {
+	return err == qmgo.ErrNoSuchDocuments || err == errors.ErrNotFound
+}
