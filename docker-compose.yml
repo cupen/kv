@@ -6,7 +6,7 @@ services:
     image: mongo:4.0
     restart: unless-stopped
     ports:
-      - 127.0.0.1:30001:27017
+      - 127.0.0.1:27017:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
@@ -16,4 +16,4 @@ services:
     image: redis:5.0.7-alpine
     restart: unless-stopped
     ports:
-      - 127.0.0.1:30002:6379
+      - 127.0.0.1:6379:6379

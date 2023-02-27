@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/cupen/kv/errors"
-	redis "github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v8"
 )
 
 type Options struct {
-	Keyspace string
-	TypeName string
-	TTL      time.Duration
+	BaseKey string
+	Type    string
+	TTL     time.Duration
 }
 
 // Redis ...
@@ -23,8 +23,6 @@ type Redis struct {
 	baseKey string
 	opts    *Options
 }
-
-var ctx = context.Background()
 
 // New ...
 func New(client *redis.Client, opts *Options) (*Redis, error) {
@@ -36,9 +34,19 @@ func New(client *redis.Client, opts *Options) (*Redis, error) {
 	}
 	return &Redis{
 		client:  client,
-		baseKey: fmt.Sprintf("%s:%s:", opts.Keyspace, opts.TypeName),
+		baseKey: fmt.Sprintf("%s:%s:", opts.BaseKey, opts.Type),
 		opts:    opts,
 	}, nil
+}
+
+// NewWithURL ...
+func NewWithURL(url string, opts *Options) (*Redis, error) {
+	connOpts, err := redis.ParseURL(url)
+	if err != nil {
+		return nil, err
+	}
+	client := redis.NewClient(connOpts)
+	return New(client, opts)
 }
 
 func (r *Redis) buildKey(id interface{}) string {
@@ -65,7 +73,7 @@ func (r *Redis) buildKey(id interface{}) string {
 // Get ...
 func (r *Redis) Get(id, val interface{}) error {
 	key := r.buildKey(id)
-	data, err := r.client.Get(ctx, key).Bytes()
+	data, err := r.client.Get(context.TODO(), key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
 			return errors.ErrNotFound
@@ -82,11 +90,11 @@ func (r *Redis) Set(id, val interface{}) error {
 	if err != nil {
 		return err
 	}
-	return r.client.Set(ctx, key, data, r.opts.TTL).Err()
+	return r.client.Set(context.TODO(), key, data, r.opts.TTL).Err()
 }
 
 // Del ...
 func (r *Redis) Del(id interface{}) error {
 	key := r.buildKey(id)
-	return r.client.Del(ctx, key).Err()
+	return r.client.Del(context.TODO(), key).Err()
 }

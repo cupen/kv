@@ -43,7 +43,7 @@ func Connect(_url string, opts ...options.ClientOptions) (*qmgo.Client, error) {
 	}
 	database := u.EscapedPath()[1:]
 	if database == "" {
-		return nil, fmt.Errorf("empty mongodb database name")
+		return nil, fmt.Errorf("invalid mongodb database '%s'", database)
 	}
 	conf := qmgo.Config{
 		Uri: _url,
@@ -83,6 +83,7 @@ func (mc *Collection) Del(key interface{}) error {
 		if err == qmgo.ErrNoSuchDocuments {
 			// return errors.ErrNotFound
 			return nil
+			// return errors.ErrNotFound
 		}
 		return err
 	}

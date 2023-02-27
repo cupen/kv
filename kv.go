@@ -1,21 +1,22 @@
 package kv
 
-type _Key interface {
-	string | int | int32 | int64 | float64
-}
-
-type _Value any
+type (
+	Key interface {
+		string | int | int32 | int64 | float64
+	}
+	Value any
+)
 
 // objectCreater is a function for create object and initializing it.
-type objectCreater[K _Key, V _Value] func(K) (V, error)
+type objectCreater[K Key, V Value] func(K) (V, error)
 
-type Store[K _Key, V _Value] struct {
+type Store[K Key, V Value] struct {
 	cache   DB
 	db      DB
 	creater func(K) (V, error)
 }
 
-func NewStore[K _Key, V _Value](db, cache DB, creater objectCreater[K, V]) *Store[K, V] {
+func NewStore[K Key, V Value](db, cache DB, creater objectCreater[K, V]) *Store[K, V] {
 	return &Store[K, V]{
 		cache:   cache,
 		db:      db,
@@ -53,4 +54,11 @@ func (this *Store[K, V]) Del(key K) error {
 
 func (this *Store[K, V]) Has(key K) (bool, error) {
 	return false, nil
+}
+
+func Must[T any](val T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return val
 }

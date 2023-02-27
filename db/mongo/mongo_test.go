@@ -20,7 +20,7 @@ type TestObject struct {
 }
 
 func newMongoTest(database, collection string) (*Collection, error) {
-	client, err := Connect("mongodb://root:root@127.0.0.1:30001/kv?authSource=admin")
+	client, err := Connect("mongodb://root:root@127.0.0.1:27017/kv?authSource=admin")
 	if err != nil {
 		return nil, err
 	}
